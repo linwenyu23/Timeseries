@@ -1,0 +1,22 @@
+ski=read.csv("http://www.stat.ucla.edu/~jsanchez/stat170f19/ski.csv",header=T)
+head(ski)
+data=ski$data
+skisales=ski$skisales
+pdi=ski$pdi
+sales = ts(ski$skisales, frequency=4, start=c(1964,1))
+sales
+
+skisales.model=lm(sales~pdi)
+summary(skisales.model)
+plot(pdi,skisales,ylab="skisales",xlab="PDI",main="Estimated regression line\n superimposed on scatterplot of the data")
+abline(skisales.model)
+
+ski.resmean=mean(skisales.model$residuals)
+ski.ressd=sd(skisales.model$residuals)
+ski.sdresiduals=(skisales.model$residuals-ski.resmean)/ski.ressd
+ski.sdresidualsts=ts(ski.sdresiduals,frequency=4,start=c(1964,1))
+plot.ts(ski.sdresidualsts,main="Model residuals",ylab="standardized residuals")
+abline(h=0)
+
+library(lmtest)
+dwtest(skisales.model,alternative=c("greater"))
