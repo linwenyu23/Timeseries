@@ -1,0 +1,34 @@
+install.packages("tseries")
+library(tseries)
+
+####Question 3
+lumber=read.csv("http://www.stat.ucla.edu/~jsanchez/stat170f19/lumber.csv",header=T)
+head(lumber)
+production = ts(lumber, frequency=1, start=c(1947,1))
+par(mfrow=c(1,1))
+plot.ts(production,type="l",main="Production 1947-1976",  ylab="Production")
+
+
+production.model=lm(production~1)
+summary(production.model)
+
+resmean.Q3=mean(production.model$residuals)
+ressd.Q3=sd(production.model$residuals)
+sdresiduals.Q3=(production.model$residuals-resmean.Q3)/ressd.Q3
+sdresidualsts.Q3=ts(sdresiduals.Q3,frequency=1,start=c(1947,1))
+plot.ts(sdresidualsts.Q3,main="Model residuals",ylab="standardized residuals")
+abline(h=0)
+
+
+length=length(residuals(production.model))
+et1=residuals(production.model)[-1]
+etn=residuals(production.model)[-length]
+plot(et1, etn, xlab=expression(e[t]),ylab=expression(e[t-1]), main="residuals at t and t-1")
+
+
+library(lmtest)
+dwtest(production.model,alternative=c("greater") )
+
+
+test=runs.test(factor(sign(sdresiduals.Q3)),alternative="less")  
+test 
