@@ -1,0 +1,21 @@
+expend=read.csv("http://www.stat.ucla.edu/~jsanchez/stat170f19/expenditures.csv",header=T)
+head(expend)
+exp=expend$Expenditure
+st=expend$Stock
+expenditure = ts(expend$Expenditure, frequency=4, start=c(1952,1))
+stock=ts(expend$Stock, frequency=4, start=c(1952,1)) 	
+
+expenditure.model=lm(expenditure~stock)
+length=length(residuals(expenditure.model))
+et1=residuals(expenditure.model)[-1]
+etn=residuals(expenditure.model)[-length]
+cor(et1,etn)
+
+library(nlme)
+modelgls=gls(exp~st, correlation=corARMA(c(0.8227),p=1))
+summary(modelgls)
+plot(y=residuals(modelgls,type="normalized"),x=as.vector(time(stock)), type="l",ylab="uncorrelated residuals",xlab="Time",main="Example of uncorrelated residuals")
+abline(h=0)
+
+residuals_ts=ts(modelgls$residuals,frequency=4,start=c(1952,1))
+Box.test (residuals_ts, lag = 20, type = "Ljung")
